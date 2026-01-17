@@ -1,0 +1,5 @@
+{
+  "name": "RPR-KONTROL Dashboard",
+  "description": "A dashboard for monitoring RPR-KONTROL sessions, agent performance, and generating project reports for RPR COMMUNICATIONS, LLC.",
+  "requestFramePermissions": []
+}
