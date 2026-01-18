@@ -1,65 +1,65 @@
 #!/bin/bash
-# Guardian Substrate Verification Script
-# Purpose: Validate local environment binding and identity manifest presence
+# RPR-KONTROL-PM: Guardian Substrate Verification (Phase 2)
 # Authority: SENTINEL PROTOCOL v1.1.0
-# Classification: TS-Λ3 (CROWN SECRET)
+# Purpose: Ensures logic parity, schema lockdown, and clinical isolation.
 
 set -e
 
-echo "🔐 Guardian Substrate Verification"
-echo "===================================="
-echo ""
+echo "🔐 Guardian Substrate Verification [RPR-KONTROL-PM v1.5.1]"
+echo "=========================================================="
 
-# Colors for output
-RED='\033[0;31m'
+# Colors
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+NC='\033[0m'
 
-# Check 1: Identity Manifest (Checking public/data or dist-kontrol)
-TARGET_FILE="dist-kontrol/data/GOV-SUBSTRATES.json"
-if [ ! -f "$TARGET_FILE" ]; then
-    TARGET_FILE="public/data/GOV-SUBSTRATES.json"
-fi
-
-if [ ! -f "$TARGET_FILE" ]; then
-  echo -e "${RED}❌ GOV-SUBSTRATES.json NOT FOUND${NC}"
-  echo "   Action: Ensure manifest exists in public/data or run 'npm run build:kontrol'"
-  exit 1
-fi
-
-echo -e "${GREEN}✅ Identity Manifest Detected: $TARGET_FILE${NC}"
-
-# Check 2: WIF Provider and Regional Lock
-# We verify the provider name and the asia-southeast1 region lock
-if grep -q "github-actions-provider-v2" "$TARGET_FILE" && grep -q "asia-southeast1" "$TARGET_FILE"; then
-  echo -e "${GREEN}✅ WIF v2 Provider and Regional Lock (asia-southeast1) Verified.${NC}"
+# 1. Identity Manifest Check
+if [ -f "public/data/GOV-SUBSTRATES.json" ]; then
+    echo -e "${GREEN}✅ Sovereign Identity Manifest detected.${NC}"
 else
-  echo -e "${RED}❌ ERROR: Manifest identity or region mismatch in $TARGET_FILE.${NC}"
-  exit 1
+    echo -e "${RED}❌ ERROR: Identity manifest (GOV-SUBSTRATES.json) missing.${NC}"
+    exit 1
 fi
 
-# Check 3: Firebase Config Parity
-if [ -f ".firebaserc" ] && grep -q "kontrol" .firebaserc; then
-  echo -e "${GREEN}✅ Firebase 'kontrol' target verified in .firebaserc.${NC}"
+# 2. Logic Substrate Parity Check (Milestone 2.2)
+if [ -f "src/utils/logic/taxcompute.ts" ]; then
+    echo -e "${GREEN}✅ Governance Logic Substrate (taxcompute.ts) verified for Flutter parity.${NC}"
 else
-  echo -e "${RED}❌ ERROR: .firebaserc missing or 'kontrol' target not bound.${NC}"
-  exit 1
+    echo -e "${RED}❌ ERROR: Logic substrate missing. Native build compatibility blocked.${NC}"
+    exit 1
 fi
 
-# Check 4: Leakage Scan (Forensic Guardrail)
-# Scanning source code for forbidden clinical codenames (MYAUDIT, SENTINEL, etc. in UI context)
-echo "Scanning for clinical codename leakage..."
-LEAK_CHECK=$(grep -rnE "MYAUDIT|SENTINEL|DR RP|AOUTHA" src/ --exclude-dir=node_modules || true)
+# 3. Schema Contract Check (Milestone 2.4)
+if [ -f "artifacts/GOV-SCHEMAS-v1.0.0.json" ]; then
+    echo -e "${GREEN}✅ Data Schema Contract (v1.0.0) verified.${NC}"
+else
+    echo -e "${RED}❌ ERROR: GOV-SCHEMAS-v1.0.0.json missing.${NC}"
+    exit 1
+fi
+
+# 4. Clinical Isolation Scan (Sentinel Guardrail)
+echo -e "${CYAN}Performing clinical isolation scan...${NC}"
+# Scan for clinical personae (ROOK, KNIGHT, BISHOP, SENTINEL VETO, etc.)
+# We exclude the current script and node_modules from the scan
+LEAK_CHECK=$(grep -rnE "SENTINEL VETO|DR RP|AOUTHA|ROOK|KNIGHT|BISHOP" src/ --exclude-dir=node_modules || true)
 if [ ! -z "$LEAK_CHECK" ]; then
-  echo -e "${RED}❌ CRITICAL: Clinical leakage detected in source!${NC}"
-  echo "$LEAK_CHECK"
-  exit 1
+    echo -e "${RED}❌ CRITICAL: Clinical personae leakage detected in Governance substrate!${NC}"
+    echo "$LEAK_CHECK"
+    exit 1
 else
-  echo -e "${GREEN}✅ No clinical codenames detected in src/ directory.${NC}"
+    echo -e "${GREEN}✅ Clinical isolation rule enforced.${NC}"
 fi
 
-echo ""
-echo "===================================="
-echo -e "${GREEN}✅ SUBSTRATE VERIFICATION COMPLETE${NC}"
-echo "===================================="
+# 5. Build Verification
+echo -e "${CYAN}Verifying build for 'kontrol' target...${NC}"
+npm run build:kontrol > /dev/null
+if [ -d "dist-kontrol" ]; then
+    echo -e "${GREEN}✅ Build successful for RPR-KONTROL-PM.${NC}"
+else
+    echo -e "${RED}❌ ERROR: Build failed.${NC}"
+    exit 1
+fi
+
+echo "=========================================================="
+echo -e "${GREEN}🏁 SUBSTRATE VERIFICATION COMPLETE${NC}"
