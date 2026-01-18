@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, ChangeEvent, useMemo } from 'react';
+import React, { useState, useCallback, ChangeEvent, useMemo, useEffect } from 'react';
 import Header from './components/Header';
 import SessionInitForm from './components/SessionInitForm';
 import SessionOverview from './components/SessionOverview';
@@ -20,6 +20,7 @@ import {
 } from './constants';
 import { useRegistryArchive } from './hooks/useRegistryArchive';
 import { validateAgentOutput } from './utils/sentinelGuard';
+import { initSubstrateIdentity } from './src/utils/substrateInit';
 
 type ViewMode = 'active_session' | 'project_overview';
 
@@ -38,6 +39,10 @@ const App: React.FC = () => {
   const [decisionKeyword, setDecisionKeyword] = useState<string>('');
 
   const { sessions: archivedSessions, loading: registryLoading, error: registryError } = useRegistryArchive(selectedProjectScope);
+
+  useEffect(() => {
+    initSubstrateIdentity();
+  }, []);
 
   const handleInitializeSession = useCallback((session: SessionSchema) => {
     const initialGeminiContent = 'RPR-KONTROL Document Controller initialized.\n\nSession ID: ' + session.sessionId + '\nProject Code: ' + session.projectCode + '\nClassification: ' + session.classification + '\nAgents tracked: ' + AGENTS_TRACKED.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') + '\nMemory: Active\nPerformance tracking: Enabled\nFlutter sync: Ready\n\nAwaiting project context and first directive.';
