@@ -2,7 +2,6 @@
  * RPR-KONTROL Drive Auth Substrate
  * Role: Manages OAuth2 handshake for the Sovereign Vault.
  * Classification: TS-Λ3
- * Protocol: GIS-BRIDGE-v1
  */
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -14,13 +13,8 @@ declare global {
   }
 }
 
-/**
- * initializeDriveAuth
- * Loads the Google Identity Services substrate and prepares the token bridge.
- */
 export const initializeDriveAuth = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (typeof document === 'undefined') return resolve();
     if (document.getElementById('gsi-client')) return resolve();
 
     const script = document.createElement('script');
@@ -32,12 +26,8 @@ export const initializeDriveAuth = (): Promise<void> => {
   });
 };
 
-/**
- * requestSovereignAccessToken
- * Triggers the OAuth2 flow to obtain a short-lived token for Vault access.
- */
 export const requestSovereignAccessToken = (callback: (token: string) => void) => {
-  if (typeof window === 'undefined' || !window.google) {
+  if (!window.google) {
     console.error("⚠️ SENTINEL: GIS substrate not initialized.");
     return;
   }
