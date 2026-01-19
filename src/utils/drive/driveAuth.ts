@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 /**
  * RPR-KONTROL Drive Auth Substrate
  * Role: Manages OAuth2 handshake for the Sovereign Vault.
