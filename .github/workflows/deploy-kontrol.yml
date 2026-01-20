@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "🛰️ Authenticate via OIDC"
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: 'projects/796960601918/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider-v2'
@@ -26,9 +27,9 @@ jobs:
           npm ci
           npm run build:kontrol
 
-      - name: "🚀 Firebase Hosting Injection"
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: 'github-actions-deployer@rpr-myaudit.iam.gserviceaccount.com'
-          target: kontrol
+      - name: "🚀 Sovereign Push (Direct CLI Injection)"
+        run: |
+          # Injecting OIDC credentials into Firebase CLI via ADC
+          npx firebase-tools deploy --only hosting:kontrol --project rpr-myaudit
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
