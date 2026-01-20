@@ -3,7 +3,8 @@ import { GoogleGenAI } from '@google/genai';
 import { PerformanceReportData, AgentType, Artifact, Classification, ArtifactType, SessionSchema } from '../types';
 import { MOCK_ARTIFACTS } from '../constants';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// GEMINI-BRIDGE: Using Vite-native environment variables (VITE_ prefix required)
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export const generatePerformanceReport = async (
   sessionId: string,

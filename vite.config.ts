@@ -1,28 +1,22 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+// vite.config.ts - AUTHORITATIVE BASELINE
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
-    const outputDir = env.BUILD_OUTPUT_DIR || 'dist';
-
-    return {
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
-      plugins: [react()],
-      build: {
-        outDir: outputDir,
-      },
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
-    };
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    strictPort: true, // LOCK: Ensure OAuth origin consistency
+    host: true,
+  },
+  build: {
+    outDir: 'dist-kontrol', // PARTITION: Governance build target
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 });

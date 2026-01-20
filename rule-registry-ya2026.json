@@ -1,0 +1,52 @@
+{
+  "protocol": "KONTROL-GOV-PROT",
+  "version": "1.1.0",
+  "authority": "SENTINEL PROTOCOL v1.1.0",
+  "project": "RPR-KONTROL-PMP",
+  "purpose": "Forensic Brain rule registry for infrastructure integrity and global data protection oversight",
+  "last_updated": "2026-01-20T10:30:00Z",
+  "rules": [
+    {
+      "id": "IDENTITY-LOCK-ENFORCEMENT",
+      "type": "security",
+      "description": "OAuth Client ID suffix validation (ssk3c for Governance, rnoem for Clinical)",
+      "governance_suffix": "ssk3c",
+      "clinical_suffix": "rnoem",
+      "enforcement": "strict",
+      "statutory_anchor": "RPR-K-TECH-061"
+    },
+    {
+      "id": "FREQUENCY-LOCK-ENFORCEMENT",
+      "type": "security",
+      "description": "Vite port lock enforcement for OAuth origin consistency",
+      "port": 5173,
+      "strict_port": true,
+      "statutory_anchor": "RPR-K-TECH-061"
+    },
+    {
+      "id": "DATA-RESIDENCY-HARBOR-LOCK",
+      "type": "compliance",
+      "description": "Regional harbor lock enforcement for PII datasets",
+      "region": "asia-southeast1",
+      "enforcement": "strict",
+      "statutory_anchor": "SENTINEL-v1.1.0 / Regional Data Privacy Standards"
+    },
+    {
+      "id": "PII-DATA-RETENTION-GENERIC",
+      "type": "privacy",
+      "description": "High-standard PII retention policy enforcement (7-year forensic window)",
+      "retention_period_days": 2555,
+      "statutory_anchor": "RPR-KONTROL Data Protection Policy (GDPR-Level Standard)"
+    }
+  ],
+  "metadata": {
+    "rule_count": 4,
+    "categories": ["security", "compliance", "privacy"],
+    "statutory_frameworks": [
+      "SENTINEL PROTOCOL v1.1.0",
+      "RPR-K-TECH-061",
+      "Global Data Privacy Standards",
+      "RPR-KONTROL Internal Policy"
+    ]
+  }
+}
