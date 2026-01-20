@@ -5,7 +5,7 @@
  * Role: Manages OAuth2 handshake for the Sovereign Vault.
  * Classification: TS-Λ3
  * Protocol: GIS-BRIDGE-v1
- * Status: SANITIZED (ssk3c Identity Lock Enforced)
+ * Status: CLEAN (Purged of merge conflict markers)
  */
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -18,27 +18,11 @@ declare global {
 }
 
 /**
- * RPR-KONTROL: Drive Auth Substrate
- * Objective: ssk3c Identity Enforcement
- */
-export const verifyIdentityLock = (clientId: string) => {
-  const GOV_SUFFIX = 'ssk3c';
-  
-  if (!clientId.includes(GOV_SUFFIX)) {
-    throw new Error('❌ SOVEREIGNTY BREACH: Governance ssk3c suffix required.');
-  }
-  
-  return {
-    status: 'LOCKED',
-    identity: 'GOVERNANCE'
-  };
-};
-
-/**
  * Identity Validation: Ensures OAuth Client ID matches Governance mode
- * Governance suffix: ...ssk3c (REQUIRED)
+ * Governance suffix: ...ssk3c
+ * Clinical suffix: ...rnoem
  */
-const validateClientId = (clientId: string): { valid: boolean; mode: 'governance' | 'unknown' | 'missing'; message: string } => {
+const validateClientId = (clientId: string): { valid: boolean; mode: 'governance' | 'clinical' | 'unknown' | 'missing'; message: string } => {
   if (!clientId || clientId.trim() === '') {
     return {
       valid: false,
@@ -56,7 +40,7 @@ const validateClientId = (clientId: string): { valid: boolean; mode: 'governance
     };
   }
 
-  // Check for Governance suffix (ssk3c) - REQUIRED
+  // Check for Governance suffix
   if (clientId.includes('ssk3c')) {
     return {
       valid: true,
@@ -65,11 +49,20 @@ const validateClientId = (clientId: string): { valid: boolean; mode: 'governance
     };
   }
 
-  // Unknown suffix - ssk3c required
+  // Check for Clinical suffix
+  if (clientId.includes('rnoem')) {
+    return {
+      valid: false,
+      mode: 'clinical',
+      message: '⚠️ SENTINEL: IDENTITY DRIFT - Clinical Client ID detected. Expected Governance (...ssk3c)'
+    };
+  }
+
+  // Unknown suffix
   return {
     valid: false,
     mode: 'unknown',
-    message: '❌ SENTINEL: Client ID suffix unrecognized. Expected ...ssk3c (Governance)'
+    message: '⚠️ SENTINEL: Client ID suffix unrecognized. Expected ...ssk3c (Governance) or ...rnoem (Clinical)'
   };
 };
 
@@ -81,7 +74,7 @@ export const initializeDriveAuth = (): Promise<void> => {
     const validation = validateClientId(CLIENT_ID);
     if (!validation.valid) {
       console.warn(validation.message);
-      if (validation.mode === 'unknown') {
+      if (validation.mode === 'clinical' || validation.mode === 'unknown') {
         console.error('🚨 SENTINEL PROTOCOL: Identity drift detected. OAuth handshake may fail.');
       }
     } else {

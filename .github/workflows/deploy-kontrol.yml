@@ -1,58 +1,34 @@
-name: RPR-KONTROL DEPLOY (GOVERNANCE TOWER)
-
-# Authority: SENTINEL PROTOCOL v1.8.0
-# Protocol: RPR-K-TECH-061 (Keyless Sovereign Substrate)
-# Status: AUTHORITATIVE
-
+name: "🛡️ Sovereign Deploy: Step 01"
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
-  contents: read
-  id-token: write # MANDATORY for OIDC/WIF v2 Handshake
+  contents: 'read'
+  id-token: 'write'
 
 jobs:
   deploy:
-    name: "🛡️ Sovereign Deploy: Kontrol"
     runs-on: ubuntu-latest
-
     steps:
       - name: "🛰️ Checkout Substrate"
         uses: actions/checkout@v4
 
-      - name: "⚙️ Setup Node (LTS Alignment)"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: "🛠️ Install Dependencies"
-        run: npm ci
-
-      - name: "🏗️ Execute Governance Build"
-        # Injects the project-specific environment variables for build-time manifest generation
-        env:
-          VITE_FIREBASE_PROJECT_ID: rpr-myaudit
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_GOV }} # ...ssk3c suffix expected
-          VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: npm run build:kontrol
-
-      - name: "🔐 Authenticate to GCP (WIF v2 Bridge)"
-        id: auth
+      - name: "🛰️ Authenticate via OIDC"
         uses: google-github-actions/auth@v2
         with:
-          # Authority: github-actions-provider-v2 (Active)
           workload_identity_provider: 'projects/796960601918/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider-v2'
           service_account: 'github-actions-deployer@rpr-myaudit.iam.gserviceaccount.com'
-          token_format: 'access_token' # Critical for Direct CLI Token Bridge
 
-      - name: "🚀 Firebase Deploy (Direct CLI)"
-        env:
-          # The Direct CLI consumes the ephemeral OIDC token as an environment variable
-          FIREBASE_TOKEN: ${{ steps.auth.outputs.access_token }}
+      - name: "🏗️ Authoritative Build"
         run: |
-          npx firebase-tools deploy \
-            --only hosting:kontrol \
-            --project rpr-myaudit \
-            --non-interactive
+          npm ci
+          npm run build:kontrol
+
+      - name: "🚀 Firebase Hosting Injection"
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: 'github-actions-deployer@rpr-myaudit.iam.gserviceaccount.com'
+          target: kontrol
