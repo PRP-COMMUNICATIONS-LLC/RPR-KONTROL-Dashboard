@@ -1,8 +1,9 @@
+# [LEGACY] - Deprecated by RPR-K-TECH-061 v1.8.0. DO NOT EXECUTE.
 name: Guardian Deployment & Verification
 
 on:
   push:
-    branches: [ main ]
+    branches: [ legacy-ignore ]
 
 permissions:
   contents: read
