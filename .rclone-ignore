@@ -1,0 +1,20 @@
+# EXCLUSIONS (rclone --filter-from: - = exclude, + = include)
+- node_modules/**
+- .next/**
+- dist/**
+- dist-kontrol/**
+- build/**
+- coverage/**
+- .DS_Store
+- .Spotlight-V100
+- .Trashes
+- .vscode/**
+- .idea/**
+- *.log
+- .env*
+- .firebaserc
+- .cache/**
+- .turbo/**
+- .parcel-cache/**
+- __pycache__/**
+- *.pyc
